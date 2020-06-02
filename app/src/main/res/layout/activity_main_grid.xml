@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:rowCount="4" android:columnCount="2"
+    android:layout_weight="1" android:layout_gravity="fill">
+
+    <TextView
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="2"
+        android:layout_gravity="fill"
+        android:text="@string/GUI"
+        android:textSize="30dp"/>
+
+    <Button
+        android:id="@+id/button_show"
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="1"
+        android:layout_gravity="fill"
+        android:text="@string/button"/>
+
+    <CheckBox
+        android:id="@+id/checkbox_button"
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="1"
+        android:layout_gravity="fill"
+        android:text="@string/checkbox"/>
+
+    <ImageButton
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="1"
+        android:layout_gravity="fill"
+        android:src="@drawable/flag"/>
+
+    <Switch
+        android:id="@+id/switch_button"
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="1"
+        android:layout_gravity="fill"
+        android:text="@string/switch_bar"/>
+
+    <EditText
+        android:layout_rowSpan="1"
+        android:layout_columnSpan="2"
+        android:layout_columnWeight="1"
+        android:layout_gravity="top"
+        android:hint="@string/hint"
+        android:inputType="textPersonName"/>
+
+</GridLayout>
