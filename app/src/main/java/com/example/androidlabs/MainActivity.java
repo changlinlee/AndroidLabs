@@ -14,10 +14,12 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
+    //test
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_relative);
+        setContentView(R.layout.activity_main_linear);
 
         Button mButton = (Button) findViewById(R.id.button_show);
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -69,5 +71,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 }
