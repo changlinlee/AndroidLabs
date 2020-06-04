@@ -14,8 +14,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
-    //test
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,13 +34,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton cb, boolean b) {
                 if (b) {
-                Snackbar.make(getWindow().getCurrentFocus(),
+                Snackbar.make(mCheckBox,
                         getResources().getString(R.string.checkbox_on), Snackbar.LENGTH_LONG)
                         .setAction(getResources().getString(R.string.undo), click -> {
                             cb.setChecked(false);
                         }).show();
                 } else {
-                    Snackbar.make(getWindow().getCurrentFocus(),
+                    Snackbar.make(mCheckBox,
                             getResources().getString(R.string.checkbox_off), Snackbar.LENGTH_LONG)
                             .setAction(getResources().getString(R.string.undo), click -> {
                                 cb.setChecked(true);
@@ -56,13 +54,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton cb, boolean b) {
                 if (b) {
-                    Snackbar.make(getWindow().getCurrentFocus(),
+                    Snackbar.make(mSwitch,
                             getResources().getString(R.string.switch_on), Snackbar.LENGTH_LONG)
                             .setAction(getResources().getString(R.string.undo), click -> {
                                 cb.setChecked(false);
                             }).show();
                 } else {
-                    Snackbar.make(getWindow().getCurrentFocus(),
+                    Snackbar.make(mSwitch,
                             getResources().getString(R.string.switch_off), Snackbar.LENGTH_LONG)
                             .setAction(getResources().getString(R.string.undo), click -> {
                                 cb.setChecked(true);
