@@ -13,4 +13,16 @@
     <string name="checkbox">Check this out!</string>
     <string name="switch_bar">Switch on / off</string>
     <string name="hint">Type here</string>
+    <string name="email_text_login">Enter your email address:</string>
+    <string name="email_hint_login">Type email here</string>
+    <string name="password">Type your password:</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="user_profile">Your profile</string>
+    <string name="name_profile">Your name:</string>
+    <string name="user_name">Enter your name</string>
+    <string name="email_text_profile">Your email:</string>
+    <string name="email_hint_profile">Enter your email</string>
+    <string name="picture">Your picture:</string>
+    <string name="btn_text_profile">Click the button above to take a picture</string>
+
 </resources>

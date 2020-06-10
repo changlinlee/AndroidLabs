@@ -14,4 +14,15 @@
     <string name="checkbox">请勾选！</string>
     <string name="switch_bar">切换开/关</string>
     <string name="hint">请在此输入</string>
+    <string name="email_text_login">请输入你的邮箱：</string>
+    <string name="email_hint_login">在此输入邮箱</string>
+    <string name="password">请输入你的密码：</string>
+    <string name="btn_login">登录</string>
+    <string name="user_profile">你的资料</string>
+    <string name="name_profile">你的名字：</string>
+    <string name="user_name">请输入姓名</string>
+    <string name="email_text_profile">你的邮箱：</string>
+    <string name="email_hint_profile">请输入邮箱</string>
+    <string name="picture">你的照片：</string>
+    <string name="btn_text_profile">点击按钮拍照</string>
 </resources>
