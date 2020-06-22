@@ -1,6 +1,8 @@
 package com.example.androidlabs;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -8,12 +10,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 public class ProfileActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO_PERMISSION = 1;
     public static final String ACTIVITY_NAME = "PROFILE_ACTIVITY";
 
     ImageButton mImageButton;
@@ -29,11 +35,18 @@ public class ProfileActivity extends AppCompatActivity {
         mImageButton = (ImageButton) findViewById(R.id.image_btn);
         mEmail = (EditText) findViewById(R.id.email_profile);
 
+        mImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
+
         Intent fromMain = getIntent();
         mEmail.setText(fromMain.getStringExtra("EMAIL"));
     }
 
-    public void dispatchTakePictureIntent(View view) {
+    private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);

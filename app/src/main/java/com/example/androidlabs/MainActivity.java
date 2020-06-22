@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +16,9 @@ public class MainActivity extends AppCompatActivity {
     //more email.xml
 
     private EditText email, password;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private Button login;
 
     private String emailFileName = "email";
     private String emailKey = "Email_Address";
@@ -31,6 +33,15 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(emailFileName, Context.MODE_PRIVATE);
 
         email.setText(sharedPreferences.getString(emailKey, ""));
+        login = (Button) findViewById(R.id.btn_login);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goToProfile = new Intent(MainActivity.this, ProfileActivity.class);
+                goToProfile.putExtra("EMAIL", email.getText().toString().trim());
+                startActivity(goToProfile);
+            }
+        });
 //        Button mButton = (Button) findViewById(R.id.button_show);
 //        mButton.setOnClickListener(v -> Toast.makeText(MainActivity.this,
 //                getResources().getString(R.string.toast_message),
@@ -71,13 +82,11 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
-    public void onPause(View view) {
+    @Override
+    protected void onPause() {
+        super.onPause();
         editor = sharedPreferences.edit();
         editor.putString(emailKey, email.getText().toString().trim());
         editor.commit();
-
-        Intent goToProfile = new Intent(MainActivity.this, ProfileActivity.class);
-        goToProfile.putExtra("EMAIL", email.getText().toString().trim());
-        this.startActivity(goToProfile);
     }
 }
