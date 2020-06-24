@@ -6,8 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -29,9 +37,12 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private List<ChatMessage> list = new ArrayList<>();
     private ListView chatList;
-    private Button send, receive;
+    private Button sendBtn, receiveBtn;
     private EditText message;
     private ChatAdapter chatAdapter;
+    private boolean send = true;
+    private boolean receive = false;
+    private MessageDataSource dataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +50,24 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         chatList = (ListView) findViewById(R.id.chat_list);
-        send = (Button) findViewById(R.id.btn_send);
-        receive = (Button) findViewById(R.id.btn_receive);
+        sendBtn = (Button) findViewById(R.id.btn_send);
+        receiveBtn = (Button) findViewById(R.id.btn_receive);
         message = (EditText) findViewById(R.id.message);
+
+        dataSource = new MessageDataSource(ChatRoomActivity.this);
+        dataSource.open();
+        list = dataSource.getAllMessage();
 
         chatAdapter = new ChatAdapter(ChatRoomActivity.this, R.layout.chat_row_send, list);
 
-        send.setOnClickListener(click -> {
-            list.add(new ChatMessage(message.getText().toString(), true));
+        sendBtn.setOnClickListener(click -> {
+            list.add(dataSource.createChatMessage(message.getText().toString(), send));
             chatAdapter.notifyDataSetChanged();
             message.setText("");
         });
 
-        receive.setOnClickListener(click -> {
-            list.add(new ChatMessage(message.getText().toString(), false));
+        receiveBtn.setOnClickListener(click -> {
+            list.add(dataSource.createChatMessage(message.getText().toString(), receive));
             chatAdapter.notifyDataSetChanged();
             message.setText("");
         });
@@ -70,6 +85,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                dataSource.deleteChatMessage(list.get(position));
                                 list.remove(position);
                                 chatAdapter.notifyDataSetChanged();
                                 Toast.makeText(ChatRoomActivity.this, "Succeed", Toast.LENGTH_LONG).show();
@@ -86,6 +102,12 @@ public class ChatRoomActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dataSource.close();
     }
 
     class ChatAdapter extends ArrayAdapter<ChatMessage> {
@@ -134,17 +156,137 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         @Override
         public long getItemId(int position) {
-            return position;
+            return list.get(position).getId();
         }
     }
 
     class ChatMessage {
-        public String message;
-        public boolean sendOrRec;
+        long id;
+        String message;
+        boolean sendOrRec;
 
-        public ChatMessage(String message, boolean sendOrRec) {
+        public ChatMessage() {
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setMessage(String message) {
             this.message = message;
+        }
+
+        public void setSendOrRec(boolean sendOrRec) {
             this.sendOrRec = sendOrRec;
+        }
+    }
+
+    class ChatSQLiteHelper extends SQLiteOpenHelper {
+        static final String TABLE_NAME = "message";
+        static final String ID = "id";
+        static final String CONTENT = "content";
+        static final String TYPE = "type";
+        static final String DATABASE_NAME = "message.db";
+        static final int DATABASE_VERSION = 1;
+        static final String DATABASE_CREATE = "CREATE TABLE "
+                + TABLE_NAME + "( " + ID
+                + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + CONTENT + " TEXT, " + TYPE + " INTEGER NOT NULL);";
+
+        public ChatSQLiteHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(DATABASE_CREATE);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+            onCreate(db);
+        }
+    }
+
+    class MessageDataSource {
+        SQLiteDatabase database;
+        ChatSQLiteHelper dbHelper;
+        String[] allColumns = { ChatSQLiteHelper.ID, ChatSQLiteHelper.CONTENT, ChatSQLiteHelper.TYPE};
+
+        public MessageDataSource(Context context) {
+            dbHelper = new ChatSQLiteHelper(context);
+        }
+
+        public void open() throws SQLException {
+            database = dbHelper.getWritableDatabase();
+        }
+
+        public void close() {
+            dbHelper.close();
+        }
+
+        public ChatMessage createChatMessage(String message, boolean type) {
+            ContentValues values = new ContentValues();
+            values.put(ChatSQLiteHelper.CONTENT, message);
+            values.put(ChatSQLiteHelper.TYPE, type);
+            long insertId = database.insert(ChatSQLiteHelper.TABLE_NAME, null, values);
+            Cursor cursor = database.query(ChatSQLiteHelper.TABLE_NAME, allColumns,
+                    ChatSQLiteHelper.ID + "=" + insertId,
+                    null, null, null, null);
+            cursor.moveToFirst();
+            printCursor(cursor, database.getVersion());
+            ChatMessage newMessage = cursorToChatMessage(cursor);
+            cursor.close();
+            return newMessage;
+        }
+
+        private ChatMessage cursorToChatMessage(Cursor cursor) {
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setId(cursor.getLong(0));
+            chatMessage.setMessage(cursor.getString(1));
+            chatMessage.setSendOrRec(cursor.getString(2).equals("1"));
+            return chatMessage;
+        }
+
+        public void deleteChatMessage(ChatMessage chatMessage) {
+            long id = chatMessage.id;
+            database.delete(ChatSQLiteHelper.TABLE_NAME, ChatSQLiteHelper.ID + "=" + id, null);
+        }
+
+        public List<ChatMessage> getAllMessage() {
+            List<ChatMessage> messages = new ArrayList<>();
+            Cursor cursor = database.query(ChatSQLiteHelper.TABLE_NAME, allColumns,
+                    null, null, null, null, null);
+            cursor.moveToFirst();
+            printCursor(cursor, database.getVersion());
+            while (!cursor.isAfterLast()) {
+                ChatMessage chatMessage = cursorToChatMessage(cursor);
+                messages.add(chatMessage);
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return messages;
+        }
+
+        public void printCursor(Cursor cursor, int version) {
+            Log.e(TAG, "version: " + version);
+            Log.e(TAG, "The number of columns: " + cursor.getColumnCount());
+            Log.e(TAG, "The name of the columns: " + Arrays.toString(cursor.getColumnNames()));
+            Log.e(TAG, "The number of rows: " + cursor.getCount());
+            while (!cursor.isAfterLast()) {
+                String result = cursor.getString(0) + ", "
+                        + cursor.getString(1) + ", "
+                        + cursor.getString(2);
+                Log.e(TAG, "row content: " + result);
+                cursor.moveToNext();
+            }
+            cursor.moveToFirst();
         }
     }
 }
