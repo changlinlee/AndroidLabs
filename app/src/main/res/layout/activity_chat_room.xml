@@ -5,40 +5,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ChatRoomActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <ListView
         android:id="@+id/chat_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:divider="@null"
         android:layout_weight="1"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="5dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_send"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="SEND"/>
+            android:text="@string/btn_send_message"
+            android:layout_gravity="center_vertical"/>
 
         <EditText
             android:id="@+id/message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:hint="type here"/>
+            android:hint="@string/edit_message"
+            android:layout_gravity="center_vertical"/>
 
         <Button
             android:id="@+id/btn_receive"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="RECEIVE"/>
+            android:text="@string/btn_receive_message"
+            android:layout_gravity="center_vertical"/>
 
     </LinearLayout>
 

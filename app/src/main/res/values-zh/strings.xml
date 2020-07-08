@@ -25,4 +25,8 @@
     <string name="email_hint_profile">请输入邮箱</string>
     <string name="picture">你的照片：</string>
     <string name="btn_text_profile">点击按钮拍照</string>
+    <string name="btn_toChatRoom">去聊天室</string>
+    <string name="btn_send_message">发送</string>
+    <string name="edit_message">请在此输入</string>
+    <string name="btn_receive_message">接收</string>
 </resources>

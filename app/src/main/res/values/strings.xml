@@ -24,5 +24,8 @@
     <string name="email_hint_profile">Enter your email</string>
     <string name="picture">Your picture:</string>
     <string name="btn_text_profile">Click the button above to take a picture</string>
-
+    <string name="btn_toChatRoom">Go to chat</string>
+    <string name="btn_send_message">send</string>
+    <string name="edit_message">type here</string>
+    <string name="btn_receive_message">receive</string>
 </resources>
