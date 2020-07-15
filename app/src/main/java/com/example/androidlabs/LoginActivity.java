@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     //cd /data/data/com.example.androidlabs/shared_prefs
     //more email.xml
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToProfile = new Intent(MainActivity.this, ProfileActivity.class);
+                Intent goToProfile = new Intent(LoginActivity.this, ProfileActivity.class);
                 goToProfile.putExtra("EMAIL", email.getText().toString().trim());
                 startActivity(goToProfile);
             }
