@@ -29,4 +29,5 @@
     <string name="btn_send_message">发送</string>
     <string name="edit_message">请在此输入</string>
     <string name="btn_receive_message">接收</string>
+    <string name="go_to_weatherforecast">前往天气</string>
 </resources>

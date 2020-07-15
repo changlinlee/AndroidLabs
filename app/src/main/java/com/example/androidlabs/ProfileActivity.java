@@ -1,23 +1,14 @@
 package com.example.androidlabs;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-import com.google.android.material.snackbar.Snackbar;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -25,7 +16,6 @@ public class ProfileActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO_PERMISSION = 1;
     public static final String ACTIVITY_NAME = "PROFILE_ACTIVITY";
 
-    Button chatButton;
     ImageButton mImageButton;
     EditText mEmail;
 
@@ -36,25 +26,16 @@ public class ProfileActivity extends AppCompatActivity {
         Log.e(ACTIVITY_NAME, "In function: onCreate()");
 
         setContentView(R.layout.activity_profile);
-        chatButton = (Button) findViewById(R.id.btn_toChat);
         mImageButton = (ImageButton) findViewById(R.id.image_btn);
         mEmail = (EditText) findViewById(R.id.email_profile);
 
-        mImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dispatchTakePictureIntent();
-            }
-        });
+        mImageButton.setOnClickListener(v -> dispatchTakePictureIntent());
 
-        chatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToChat = new Intent(ProfileActivity.this, ChatRoomActivity.class);
-                startActivity(goToChat);
-            }
-        });
+        findViewById(R.id.btn_toChat).setOnClickListener(v ->
+                startActivity(new Intent(ProfileActivity.this, ChatRoomActivity.class)));
 
+        findViewById(R.id.btn_toWeather).setOnClickListener(v ->
+                startActivity(new Intent(ProfileActivity.this, WeatherForecast.class)));
         Intent fromMain = getIntent();
         mEmail.setText(fromMain.getStringExtra("EMAIL"));
     }
