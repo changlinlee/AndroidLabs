@@ -5,16 +5,18 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+    <uses-feature android:name="android.hardware.type.watch"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".WeatherForecast"></activity>
+        <activity android:name=".WeatherForecast"/>
         <activity android:name=".ChatRoomActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".MainActivity">
