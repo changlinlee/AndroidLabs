@@ -119,7 +119,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             bundle.putBoolean(MESSAGE_IS_SEND, list.get(position).sendOrRec);
 
             if (isTablet) {
-
+                fragment = new DetailsFragment();
                 fragment.setArguments(bundle);
                 getSupportFragmentManager()
                         .beginTransaction()
