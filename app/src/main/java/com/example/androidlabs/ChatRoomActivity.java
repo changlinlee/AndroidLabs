@@ -3,12 +3,15 @@ package com.example.androidlabs;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,25 +38,35 @@ import java.util.List;
 public class ChatRoomActivity extends AppCompatActivity {
 
     private static final String TAG = "ChatRoomActivity";
+    public static final String DATABASE_ID = "database_id";
+    public static final String MESSAGE_CONTENT = "message_content";
+    public static final String MESSAGE_IS_SEND = "message_isSend";
 
     private List<ChatMessage> list = new ArrayList<>();
     private ListView chatList;
     private Button sendBtn, receiveBtn;
     private EditText message;
     private ChatAdapter chatAdapter;
+    private FrameLayout mFrameLayout;
     private boolean send = true;
     private boolean receive = false;
+    private boolean isTablet = false;
     private MessageDataSource dataSource;
+    private DetailsFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        fragment = new DetailsFragment();
+
         chatList = (ListView) findViewById(R.id.chat_list);
         sendBtn = (Button) findViewById(R.id.btn_send);
         receiveBtn = (Button) findViewById(R.id.btn_receive);
         message = (EditText) findViewById(R.id.message);
+        mFrameLayout = (FrameLayout) findViewById(R.id.fragment_position);
+        isTablet = mFrameLayout != null;
 
         dataSource = new MessageDataSource(ChatRoomActivity.this);
         dataSource.open();
@@ -75,31 +89,47 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatList.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         chatList.setAdapter(chatAdapter);
 
-        chatList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatRoomActivity.this);
-                builder.setTitle("Do you want to delete this?")
-                        .setMessage("The selected row is: " + (position + 1) + "\nThe database id id:" + id)
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dataSource.deleteChatMessage(list.get(position));
-                                list.remove(position);
-                                chatAdapter.notifyDataSetChanged();
-                                Toast.makeText(ChatRoomActivity.this, "Succeed", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(ChatRoomActivity.this, "Canceled", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-                return false;
+        chatList.setOnItemLongClickListener((parent, view, position, id) -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ChatRoomActivity.this);
+            builder.setTitle("Do you want to delete this?")
+                    .setMessage("The selected row is: " + (position + 1) + "\nThe database id id:" + list.get(position).id)
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        dataSource.deleteChatMessage(list.get(position));
+                        list.remove(position);
+                        chatAdapter.notifyDataSetChanged();
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .remove(fragment)
+                                .addToBackStack(null)
+                                .commit();
+                        Toast.makeText(ChatRoomActivity.this, "Succeed", Toast.LENGTH_LONG).show();
+                    })
+                    .setNegativeButton("No", (dialog, which) ->
+                            Toast.makeText(ChatRoomActivity.this, "Canceled", Toast.LENGTH_LONG).show());
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            return true;
+        });
+
+        chatList.setOnItemClickListener((parent, view, position, id) -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(DATABASE_ID, String.valueOf(list.get(position).id));
+            bundle.putString(MESSAGE_CONTENT, list.get(position).message);
+            bundle.putBoolean(MESSAGE_IS_SEND, list.get(position).sendOrRec);
+
+            if (isTablet) {
+
+                fragment.setArguments(bundle);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_position, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                Intent intent = new Intent(ChatRoomActivity.this, EmptyActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }
@@ -156,7 +186,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         @Override
         public long getItemId(int position) {
-            return list.get(position).getId();
+            return list.get(position).id;
         }
     }
 
@@ -170,10 +200,6 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         public void setId(long id) {
             this.id = id;
-        }
-
-        public long getId() {
-            return id;
         }
 
         public void setMessage(String message) {
